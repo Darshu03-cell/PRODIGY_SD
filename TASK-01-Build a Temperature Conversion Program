@@ -1,0 +1,74 @@
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# Function to convert temperatures
+def convert_temperature(value, unit):
+    if unit == 'C':
+        fahrenheit = (value * 9/5) + 32
+        kelvin = value + 273.15
+        return fahrenheit, kelvin
+    elif unit == 'F':
+        celsius = (value - 32) * 5/9
+        kelvin = celsius + 273.15
+        return celsius, kelvin
+    elif unit == 'K':
+        celsius = value - 273.15
+        fahrenheit = (celsius * 9/5) + 32
+        return celsius, fahrenheit
+    else:
+        raise ValueError("Invalid unit. Please use 'C', 'F', or 'K'.")
+
+# Function to predict temperature using ML
+def predict_temperature(value, unit):
+    # Sample data for ML model
+    data = {
+        'C': [0, 25, 100, -40],
+        'F': [32, 77, 212, -40],
+        'K': [273.15, 298.15, 373.15, 233.15]
+    }
+
+    X = np.array(data[unit]).reshape(-1, 1)
+    y = np.array(data['C']) if unit != 'C' else np.array(data['F'])
+
+    # Linear Regression Model
+    model = LinearRegression()
+    model.fit(X, y)
+
+    # Predict temperature
+    prediction = model.predict(np.array([[value]]))
+    return prediction[0]
+
+# Main program loop
+def main():
+    print("Temperature Conversion Program with Machine Learning")
+    print("--------------------------------------------------")
+    print("Available units: Celsius (C), Fahrenheit (F), Kelvin (K)")
+
+    while True:
+        try:
+            temp_value = float(input("\nEnter temperature value: "))
+            temp_unit = input("Enter the unit (C/F/K): ").upper()
+
+            # Convert temperatures
+            converted_values = convert_temperature(temp_value, temp_unit)
+            if temp_unit == 'C':
+                print(f"{temp_value}°C = {converted_values[0]:.2f}°F, {converted_values[1]:.2f}K")
+            elif temp_unit == 'F':
+                print(f"{temp_value}°F = {converted_values[0]:.2f}°C, {converted_values[1]:.2f}K")
+            elif temp_unit == 'K':
+                print(f"{temp_value}K = {converted_values[0]:.2f}°C, {converted_values[1]:.2f}°F")
+
+            # Predict temperature using ML
+            predicted_temp = predict_temperature(temp_value, temp_unit)
+            print(f"Predicted temperature (using ML) for {temp_value}{temp_unit} is approximately {predicted_temp:.2f}")
+        
+        except ValueError as e:
+            print(f"Error: {e}")
+        
+        cont = input("\nDo you want to convert another temperature? (yes/no): ").lower()
+        if cont != 'yes':
+            print("Thank you for using the Temperature Conversion Program.")
+            break
+
+if __name__ == "__main__":
+    main()
